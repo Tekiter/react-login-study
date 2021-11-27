@@ -1,11 +1,9 @@
 import { LocalStorage } from "node-localstorage";
-import fs from "fs";
 
 export class LocalStorageStore {
   private ls: LocalStorage;
 
   constructor(storeLocation: string) {
-    fs.mkdirSync(storeLocation);
     this.ls = new LocalStorage(storeLocation);
   }
 

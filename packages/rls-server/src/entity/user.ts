@@ -1,6 +1,6 @@
 export interface User {
   username: string;
   nickname: string;
-  password_hash: string;
+  passwordHash: string;
   role: "user" | "admin";
 }

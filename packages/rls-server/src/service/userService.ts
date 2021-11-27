@@ -17,10 +17,14 @@ export class UserServiceImpl implements UserService {
   constructor(private userRepository: UserRepository) {}
 
   async createNewUser(userInfo: CreateUserInfo): Promise<void> {
+    if (await this.userRepository.isUserExists(userInfo.username)) {
+      throw new Error("중복된 아이디입니다.");
+    }
+
     const user: User = {
       username: userInfo.username,
       nickname: userInfo.nickname,
-      password_hash: await this.hashPassword(userInfo.password),
+      passwordHash: await this.hashPassword(userInfo.password),
       role: "user",
     };
 
