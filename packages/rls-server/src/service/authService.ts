@@ -56,7 +56,7 @@ export class AuthServiceImpl implements AuthService {
       },
       this.JWT_SECRET,
       {
-        expiresIn: 60,
+        expiresIn: "5m",
       }
     );
 
