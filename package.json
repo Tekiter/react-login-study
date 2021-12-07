@@ -5,6 +5,7 @@
     "packages/*"
   ],
   "scripts": {
-    "server": "yarn workspace rls-server"
+    "server": "yarn workspace rls-server",
+    "react": "yarn workspace rls-react"
   }
 }
