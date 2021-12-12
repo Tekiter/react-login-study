@@ -1,24 +1,24 @@
 import axios from "axios";
 import { ChangeEvent, useState } from "react";
 import { NavBar } from "../components/navBar";
-import { useAuthGetter, useAuthSetter } from "../utils/auth";
+import { useAuth, useAuthSetter } from "../utils/auth";
 
 export function LoginPage() {
   const loginRequest = useLoginRequest();
   const authSetter = useAuthSetter();
-  const authGetter = useAuthGetter();
+  const authGetter = useAuth();
 
   const usernameField = useTextInput();
   const passwordField = useTextInput();
 
   async function submitLogin() {
-    await loginRequest.submit({
+    const data = await loginRequest.submit({
       username: usernameField.value,
       password: passwordField.value,
     });
 
     authSetter({
-      accessToken: loginRequest.data?.accessToken ?? "",
+      accessToken: data.accessToken ?? "",
     });
   }
 
@@ -35,10 +35,19 @@ export function LoginPage() {
       <div>
         <p>Result</p>
         {JSON.stringify(loginRequest.data)}
+        <br />
         {JSON.stringify(authGetter)}
+        <br />
+        <Counter />
       </div>
     </div>
   );
+}
+
+function Counter() {
+  const [value, setValue] = useState(0);
+
+  return <button onClick={() => setValue((v) => v + 1)}>{value}</button>;
 }
 
 function useTextInput() {
@@ -78,8 +87,11 @@ function useLoginRequest() {
       setData(res.data);
 
       setActionState("success");
-    } catch {
+
+      return res.data;
+    } catch (error) {
       setActionState("error");
+      throw error;
     }
   }
 

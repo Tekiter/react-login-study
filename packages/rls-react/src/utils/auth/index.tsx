@@ -1,4 +1,5 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useRef, useState } from "react";
+import { AuthRepository, AuthRepositoryLocalStorage } from "./repository";
 
 interface AuthData {
   accessToken: string;
@@ -21,12 +22,23 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider(props: AuthProviderProps) {
+  const initRef = useRef(true);
+  let initAuthData: AuthData = { accessToken: "" };
+
+  if (initRef.current) {
+    const data = authRepository.getAuthData();
+    if (data !== null) {
+      initAuthData = data;
+    }
+
+    initRef.current = false;
+  }
+
   const [auth, setAuth] = useState<AuthContextData>({
     data: {
-      accessToken: "",
+      ...initAuthData,
     },
     setData(newData) {
-      console.log("SET");
       setAuth((auth) => ({ ...auth, data: newData }));
     },
   });
@@ -40,12 +52,25 @@ export function useAuthSetter() {
   const auth = useContext(authContext);
 
   return function (authData: AuthData) {
+    authRepository.saveAuthData(authData);
     auth.setData(authData);
   };
 }
 
-export function useAuthGetter() {
+export function useAuth() {
   const auth = useContext(authContext);
 
-  return auth.data;
+  function logout() {
+    auth.setData({
+      accessToken: "",
+    });
+    authRepository.saveAuthData({ accessToken: "" });
+  }
+
+  return {
+    data: auth.data,
+    logout,
+  };
 }
+
+const authRepository: AuthRepository = new AuthRepositoryLocalStorage();
